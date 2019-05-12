@@ -38,12 +38,8 @@ def parseXML():
     return node_list
 
 # Create graph with node type
-
 def createGraph():
     node_list = parseXML()
     osm = ox.graph_from_file('.//map//hanoi_bk.osm') # Return a networkx graph
     G = osm
     return G
-
-
-node_list = parseXML()
