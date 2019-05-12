@@ -15,7 +15,7 @@ def parseXML():
         y = node.attrib['y']
         for tag in root.findall('.//osm//node//tag'):
                 tag_dict = dict()
-                tag_dict.fromkeys(['amenity', 'shop', 'name'])
+                tag_dict.fromkeys(['amenity', 'shop', 'name', 'address'])
                 if tag.find("field[@k='amenity']") is not None:
                         amenity = tag.find("field[@k='amenity']").attrib['v']
                         tag_dict['amenity'] = amenity
@@ -25,7 +25,9 @@ def parseXML():
                 if tag.find("field[@k='name']") is not None:
                         name = tag.find("field[@k='name']").attrib['v']
                         tag_dict['name'] = name
-
+                if tag.find("field[@k='addr:street']") is not None:
+                        address = tag.find("field[@k='addr:street']").attrib['v']
+                        tag_dict['address'] = address
 
 
                 

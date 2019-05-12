@@ -10,6 +10,7 @@ Vertice: (Đang làm):
     amenity: Nơi công cộng. Giá trị có thể là hospital, park,...
     shop: Cửa hàng. Giá trị là tên cửa hàng đó.
     name: Tên địa điểm
+    address: Địa chỉ
     # Trong trường hợp vertice là các giao lộ hoặc ngã tư, thì chỉ có 3 nhãn osmid, x, y
 Edge:
     osmid
