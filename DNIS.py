@@ -1,12 +1,12 @@
 import networkx as nx
-from createGraph import createGraph
+from createGraph import loadGraph
 
 '''
 # Các nhãn của đồ thị:
 Vertice: (Đang làm):
     osmid
-    lat: Latitude.
-    lon: Longtitude.
+    x
+    y
     type: Kiểu địa điểm. Giá trị là bank, hospital, park, shop...
     name: Tên.
     address: Địa chỉ.
@@ -19,5 +19,5 @@ Edge:
 '''
 
 def dnis():
-    G = createGraph()
+    G = loadGraph()
 
