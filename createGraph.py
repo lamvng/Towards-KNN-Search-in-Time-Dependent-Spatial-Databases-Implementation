@@ -67,13 +67,6 @@ def loadGraph():
     G = nx.read_gpickle('D:\Important\PFIEV\GIS\Project\Towards-KNN-Search-in-Time-Dependent-Spatial-Databases-Implementation\graph\graph.gpickle')
     return G
 
-
 node_list = parseXML()
 G = createGraph()
 saveGraph()
-'''
-G = loadGraph()
-for node in G.nodes():
-    if node['type'] is not None:
-        print(node['type'])
-'''
