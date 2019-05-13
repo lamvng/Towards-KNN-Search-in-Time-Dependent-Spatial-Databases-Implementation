@@ -8,11 +8,12 @@ from collections import OrderedDict
 # D:\Important\PFIEV\GIS\Project\Towards-KNN-Search-in-Time-Dependent-Spatial-Databases-Implementation\map\hanoi_bk.osm
 def parseXML():
     node_list = []
-    data = et.parse(path)
+    data = et.parse('.//map//hanoi_bk.osm')
     root = data.getroot()
+    keys = ['amenity', 'shop', 'leisure', 'name', 'addr:street'] # Key in tag, in the osm file
     for node in root.findall('./node'):
         node_dict = OrderedDict()
-        node_dict.fromkeys(['id', 'lat', 'lon', 'type', 'name' 'address'])
+        node_dict.fromkeys(['id', 'lat', 'lon', 'type', 'name' 'address']) # Key in dict
         id = int(node.attrib['id'])
         lat = node.attrib['lat']
         lon = node.attrib['lon']
@@ -22,34 +23,18 @@ def parseXML():
         node_dict['type'] = None
         node_dict['name'] = None
         node_dict['address'] = None
-        for tag in node:
-            keys = ['amenity', 'shop', 'leisure', 'name', 'addr:street']
+        for tag in node.iter('tag'):
+            attrib = tag.attrib
             for key in keys:
-                syntax = "field[@k='{}']".format(key)
-                find = tag.find(syntax)
-                if find is not None:
-                    node_dict[key] = find.attrib['v']
-                    print(key)
-            '''
-            amenity = tag.find("field[@k='amenity']")
-            shop = tag.find("field[@k='shop']")
-            leisure = tag.find("field[@k='leisure']")
-            name = tag.find("field[@k='name']")
-            addr = tag.find("field[@k='addr:street']")
-            if amenity is not None:
-                node_dict['type'] = tag.find("field[@k='amenity']").attrib['v']
-            elif shop is not None:
-                node_dict['type'] = tag.find("field[@k='shop']").attrib['v']
-            elif leisure is not None:
-                node_dict['type'] = tag.find("field[@k='name']").attrib['v']
-            if name is not None:
-                node_dict['name'] = tag.find("field[@k='name']").attrib['v']
-            if addr is not None:
-                node_dict['address'] = tag.find("field[@k='addr:street']").attrib['v']
-            '''
+                if key == attrib['k']:
+                    if key == 'name':
+                        node_dict['name'] = attrib['v']
+                    elif key in ['amenity', 'shop', 'leisure']:
+                        node_dict['type'] = attrib['v']
+                    elif key == 'addr:street':
+                        node_dict['address'] = attrib['v']
         node_list.append(node_dict)
     return node_list
-
 
 # Create graph with node type
 def createGraph():
@@ -60,8 +45,13 @@ def createGraph():
         id = node['id']
         if G.has_node(id):
             for key in keys:
-                if key not in G.nodes[id]:
-                    nx.set_node_attributes(G, key, node[key]) # BUG
+                if key not in G.nodes[id] and key in node:
+                    if key == 'type':
+                        G.add_node(id, type = node['type'])
+                    if key == 'name':
+                        G.add_node(id, name = node['name'])
+                    if key == 'address':
+                        G.add_node(id, address = node['address'])
             continue
     return G
 
@@ -74,9 +64,16 @@ def saveGraph():
 
 # Load graph from file
 def loadGraph():
-    G = nx.read_gpickle('.//graph//graph.gpickle')
+    G = nx.read_gpickle('D:\Important\PFIEV\GIS\Project\Towards-KNN-Search-in-Time-Dependent-Spatial-Databases-Implementation\graph\graph.gpickle')
     return G
+
 
 node_list = parseXML()
 G = createGraph()
 saveGraph()
+'''
+G = loadGraph()
+for node in G.nodes():
+    if node['type'] is not None:
+        print(node['type'])
+'''
