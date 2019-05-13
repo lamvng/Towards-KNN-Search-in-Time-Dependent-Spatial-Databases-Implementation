@@ -67,6 +67,5 @@ def loadGraph():
     G = nx.read_gpickle('.//graph//graph.gpickle')
     return G
 
-node_list = parseXML()
-G = createGraph()
+
 saveGraph()
