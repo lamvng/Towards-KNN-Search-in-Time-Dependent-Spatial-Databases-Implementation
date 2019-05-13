@@ -64,7 +64,7 @@ def saveGraph():
 
 # Load graph from file
 def loadGraph():
-    G = nx.read_gpickle('D:\Important\PFIEV\GIS\Project\Towards-KNN-Search-in-Time-Dependent-Spatial-Databases-Implementation\graph\graph.gpickle')
+    G = nx.read_gpickle('.//graph//graph.gpickle')
     return G
 
 node_list = parseXML()
