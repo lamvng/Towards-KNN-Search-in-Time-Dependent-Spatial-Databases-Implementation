@@ -44,7 +44,6 @@ def DNIS(Graph, query_location, time_start, type_of_interest, k):
                 lv: fastest time travel from q
                 vi: last node added to S
                 NNs: array of kNN
-                tt: set of fastest time travel
     """
     
     G = Graph
@@ -54,9 +53,8 @@ def DNIS(Graph, query_location, time_start, type_of_interest, k):
     # G = nx.Graph()
     # q = G.node[1]
 
-    # init NNs and tt
+    # init NNs 
     NNs = []
-    tt = []
     # init set S
     S = []
     S.append(q)
@@ -65,6 +63,15 @@ def DNIS(Graph, query_location, time_start, type_of_interest, k):
     T.remove(q)
     # init thr first vi
     vi = q
+    if G.node[q]["type"] != None:
+        for i in G.nodes:
+            if G.node[i]["obj"] != None:
+                for j in G.node[i]["obj"]:
+                    if G.node[q]["osmid"] == j:
+                        vi = G.node[i]["osmid"]
+                        break
+
+    
 
     # init lv of nodes
     nx.set_node_attributes(G, -1, "lv")
@@ -81,7 +88,7 @@ def DNIS(Graph, query_location, time_start, type_of_interest, k):
                 G.node[vj]["lv"] = fe_tvi
             else: 
                 G.node[vj]["lv"] = min(G.node[vj]["lv"],fe_tvi)
-                #print ("G.node[",vi,"][lv]:",G.node[vj]["lv"])
+                print ("G.node[",vi,"][lv]:",G.node[vj]["lv"])
         # add the newest vi to S
         print("end loop ",leuleu)
         leuleu += 1
@@ -106,18 +113,16 @@ def DNIS(Graph, query_location, time_start, type_of_interest, k):
             Gnode = []
             Gnode = list(G.node[vi]["obj"]) 
             for i in Gnode:
-                if G.node[i]["type"] == type_of_interest:
+                if G.node[i]["type"] == type_of_interest and G.node[i]["osmid"] != q:
                     G.node[i]["lv"] = G.node[vi]["lv"]
                     NNs.append(i)
-                    tt.append(G.node[vi]["lv"])
                     NNs =  list(set(NNs))
-                    tt = list(set(tt)) 
                     print("---------------------------------------------find a new object---------------------------------------------")
             if len(NNs) >= k:
                 break
         except TypeError:
             continue
-    return NNs, tt
+    return NNs
 # G = nx.Graph()
 # print(G.edges)
 #### test data
@@ -125,18 +130,26 @@ def DNIS(Graph, query_location, time_start, type_of_interest, k):
 
 #### test DNIS
 
-NNs, tt = DNIS(G, 6413899095, 0, "bus_stop", 10)
+NNs = DNIS(G, 738814794, 0, "bus_stop", 10)
 
 print("kNN: ",NNs)
-print("fastest time travel: ",tt)
+
+
+for i in range(len(NNs)):
+    for j in range(len(NNs)):
+        if G.node[NNs[i]]["lv"] < G.node[NNs[j]]["lv"]:
+            temp = NNs[i]
+            NNs [i] = NNs[j]
+            NNs[j] = temp 
+print("kNN: ",NNs)        
+
+
 j = 0
 for i in NNs:
     j = j+1
     print("dia diem", j, ": ", G.node[i])
     print("time travel:",G.node[i]["lv"])
-for i in G.neighbors(446044222):
-    print(i)
-    print("------------neighbor-------------")
+
 
 print ("-------- done --------")
 
