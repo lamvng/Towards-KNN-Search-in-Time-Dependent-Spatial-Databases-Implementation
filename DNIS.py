@@ -1,6 +1,9 @@
+import os
+import io
+import osmnx as ox
 import networkx as nx
-import osmnx as os 
 from createGraph import loadGraph
+
 # from createGraph import createGraph
 
 '''
@@ -35,6 +38,29 @@ def cal_time_travel(G, vi, vj, t_vi = 0):
 
     return time_travel
 
+def writeOnLine (y,x,osmid,typeObj,name,address,obj,lv):
+    newline = 'y: ' + str(y) + ', x: ' + str(x) + ', osmid: ' + str(osmid) + ', type: ' + str(typeObj) + ', name: ' + str(name) 
+    newline = newline + ', address: ' + str(address) + ', obj: ' + str(obj) + ', time travel: ' + str(lv) + '\n'
+    return newline
+
+def writeFileResult(fileNameWrite,NNs):
+    fw = open(fileNameWrite,'w',encoding="utf-8")
+    
+    for i in range(len(NNs)):
+        y = G.node[NNs[i]]["y"]
+        x = G.node[NNs[i]]["x"]
+        osmid = G.node[NNs[i]]["osmid"]
+        typeObj =  G.node[NNs[i]]["type"]
+        name = G.node[NNs[i]]["name"]
+        address = G.node[NNs[i]]["address"]
+        obj = G.node[NNs[i]]["obj"]
+        lv = G.node[NNs[i]]["lv"]
+        newline = writeOnLine(y,x,osmid,typeObj,name,address,obj,lv)
+        newline =  'dia diem ' + str(i+1) + ' : ' + newline 
+        fw.write(newline)
+    fw.close
+    return
+
 def DNIS(Graph, query_location, time_start, type_of_interest, k):
     
     """
@@ -63,15 +89,14 @@ def DNIS(Graph, query_location, time_start, type_of_interest, k):
     T.remove(q)
     # init thr first vi
     vi = q
-    if G.node[q]["type"] != None:
+    Neighbor_of_q = list(G.neighbors(q))
+    if len(Neighbor_of_q) == 0:
         for i in G.nodes:
             if G.node[i]["obj"] != None:
                 for j in G.node[i]["obj"]:
                     if G.node[q]["osmid"] == j:
                         vi = G.node[i]["osmid"]
                         break
-
-    
 
     # init lv of nodes
     nx.set_node_attributes(G, -1, "lv")
@@ -126,11 +151,16 @@ def DNIS(Graph, query_location, time_start, type_of_interest, k):
 # G = nx.Graph()
 # print(G.edges)
 #### test data
+"""
+for i  in G.nodes:
+    T = list(G.neighbors(i))
+    if len(T) == 0:
+        print(G.node[i])
 
-
+"""
 #### test DNIS
 
-NNs = DNIS(G, 738814794, 0, "bus_stop", 10)
+NNs = DNIS(G, 738814794, 0, "convenience", 10)
 
 print("kNN: ",NNs)
 
@@ -150,6 +180,7 @@ for i in NNs:
     print("dia diem", j, ": ", G.node[i])
     print("time travel:",G.node[i]["lv"])
 
+writeFileResult("newResult.txt",NNs)
 
 print ("-------- done --------")
 
