@@ -12,7 +12,7 @@ os.chdir(os.getcwd())
 # D:\Important\PFIEV\GIS\Project\Towards-KNN-Search-in-Time-Dependent-Spatial-Databases-Implementation\map\hanoi_bk.osm
 def parseXML():
     node_list = []
-    data = et.parse('.//map//hanoi_bk.osm')
+    data = et.parse('.//map//hanoi_downtown.osm')
     root = data.getroot()
     keys = ['amenity', 'shop', 'leisure', 'name', 'addr:street', 'highway', 'tourism'] # Key in tag, in the osm file
     for node in root.findall('./node'):
@@ -94,11 +94,12 @@ def distance(poi_list, G):
 # Create graph with node type
 def createGraph():
     node_list = parseXML()
-    G = ox.graph_from_file('.//map//hanoi_bk.osm', retain_all = True) # Return a networkx graph
+    G = ox.graph_from_file('.//map//hanoi_downtown.osm', retain_all = True) # Return a networkx graph
     keys = ['type', 'name', 'address', 'obj']
     for node in node_list:
         id = node['id']
         if G.has_node(id):
+            G.add_node(id, obj = node['obj'])
             for key in keys:
                 if key not in G.nodes[id] and key in node:
                     if key == 'type':
@@ -107,12 +108,8 @@ def createGraph():
                         G.add_node(id, name = node['name'])
                     if key == 'address':
                         G.add_node(id, address = node['address'])
-                if key == 'obj':
-                    G.add_node(id, obj = node['obj'])
-
-
-            continue
-
+                    if key == 'obj':
+                        G.add_node(id, obj = node['obj'])
     poi_list = findPoI(G)
     G = distance(poi_list, G)
     return G
@@ -122,13 +119,13 @@ def createGraph():
 # Save graph to file
 def saveGraph():
     G = createGraph()
-    nx.write_gpickle(G,'.//graph//graph.gpickle')
+    nx.write_gpickle(G,'.//graph//graph_hn_downtown.gpickle')
 
 
 # Load graph from file
 # D:\Important\PFIEV\GIS\Project\Towards-KNN-Search-in-Time-Dependent-Spatial-Databases-Implementation\graph\graph.gpickle
 def loadGraph():
-    G = nx.read_gpickle('.//graph//graph.gpickle')
+    G = nx.read_gpickle('.//graph//graph_hn_downtown.gpickle')
     return G
 
 
